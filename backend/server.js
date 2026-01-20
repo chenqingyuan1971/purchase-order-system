@@ -40,14 +40,16 @@ const User = mongoose.model('User', userSchema);
 const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     orderId: { type: String, required: true },
+    projectKey: { type: String, required: true }, // 购货方+文档类型的唯一标识
+    purchaserName: { type: String, default: '' }, // 购货方名称
     docType: { type: String, default: '预算' },
     creatorName: { type: String, default: '未知' },
     data: { type: Object, required: true },
     createdAt: { type: Date, default: Date.now }
 });
 
-// 创建复合索引确保每个用户的订单ID唯一
-orderSchema.index({ userId: 1, orderId: 1 }, { unique: true });
+// 创建复合索引确保每个用户的项目唯一（购货方+文档类型唯一）
+orderSchema.index({ userId: 1, projectKey: 1 }, { unique: true });
 
 const Order = mongoose.model('Order', orderSchema);
 
@@ -254,59 +256,77 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
 // 创建或更新订单
 app.post('/api/orders', authenticateToken, async (req, res) => {
     try {
-        const { orderId, data, docType, creatorName } = req.body;
-        
-        if (!orderId || !data) {
-            return res.status(400).json({ message: '请提供订单ID和订单数据' });
+        const { orderId, projectKey, purchaserName, docType, creatorName, data } = req.body;
+
+        if (!projectKey || !data) {
+            return res.status(400).json({ message: '缺少必要参数' });
         }
-        
-        // 查找是否已存在
+
+        // 查找是否已存在相同的项目（购货方+文档类型）
         let order = await Order.findOne({
             userId: req.user.userId,
-            orderId: orderId
+            projectKey: projectKey
         });
-        
+
         if (order) {
-            // 更新现有订单
+            // 更新现有订单（保留原有的projectKey和purchaserName）
+            order.orderId = orderId; // 更新订单号
             order.data = data;
             order.docType = docType || '预算';
             order.creatorName = creatorName || req.user.name || '未知';
-            order.createdAt = new Date();
+            order.createdAt = new Date(); // 更新时间戳
             await order.save();
-            
-            console.log(`✓ 更新订单: ${req.user.email} - ${orderId}`);
+
+            console.log(`✓ 更新订单: ${req.user.email} - ${projectKey}`);
+            res.json({
+                message: '订单更新成功',
+                isUpdate: true,
+                order: {
+                    id: order._id,
+                    orderId: order.orderId,
+                    projectKey: order.projectKey,
+                    purchaserName: order.purchaserName,
+                    docType: order.docType,
+                    creatorName: order.creatorName,
+                    createdAt: order.createdAt
+                }
+            });
         } else {
             // 创建新订单
             order = new Order({
                 userId: req.user.userId,
                 orderId: orderId,
+                projectKey: projectKey,
+                purchaserName: purchaserName || '',
                 docType: docType || '预算',
                 creatorName: creatorName || req.user.name || '未知',
                 data: data
             });
             await order.save();
-            
-            console.log(`✓ 创建订单: ${req.user.email} - ${orderId}`);
+
+            console.log(`✓ 创建订单: ${req.user.email} - ${projectKey}`);
+            res.json({
+                message: '订单创建成功',
+                isUpdate: false,
+                order: {
+                    id: order._id,
+                    orderId: order.orderId,
+                    projectKey: order.projectKey,
+                    purchaserName: order.purchaserName,
+                    docType: order.docType,
+                    creatorName: order.creatorName,
+                    createdAt: order.createdAt
+                }
+            });
         }
-        
-        res.json({
-            message: '订单保存成功',
-            order: {
-                id: order._id,
-                orderId: order.orderId,
-                docType: order.docType,
-                creatorName: order.creatorName,
-                createdAt: order.createdAt
-            }
-        });
-        
+
     } catch (error) {
         console.error('保存订单错误:', error);
-        
+
         if (error.code === 11000) {
-            return res.status(400).json({ message: '订单ID已存在，请使用不同的订单ID' });
+            return res.status(400).json({ message: '项目已存在，请刷新后重试' });
         }
-        
+
         res.status(500).json({ message: '服务器错误，保存订单失败' });
     }
 });
