@@ -9,22 +9,25 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 3mm 5mm 3mm 5mm !important;
+                margin: 0 !important;
+                marks: none;
             }
             
-            html, body {
-                width: 100%;
-                height: auto;
-                margin: 0;
-                padding: 0;
-                background: white;
+            html {
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             body {
+                margin: 0 !important;
+                padding: 0 !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 font-size: 9px;
                 line-height: 1.1;
+                width: 100%;
+                height: auto;
+                overflow: visible !important;
             }
             
             .header-bar, .action-buttons, .modal-overlay, .history-drawer, .no-print, 
@@ -36,20 +39,21 @@
                 width: 100% !important;
                 max-width: 100% !important;
                 margin: 0 !important;
-                padding: 3px !important;
+                padding: 4mm 6mm !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
                 background: white !important;
                 position: relative !important;
                 overflow: visible !important;
+                page-break-after: avoid;
             }
             
             .header {
                 position: relative !important;
                 background: #f8f9fa !important;
                 page-break-after: avoid;
-                margin-bottom: 3px !important;
-                padding: 4px 6px !important;
+                margin-bottom: 2mm !important;
+                padding: 3mm 4mm !important;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -59,30 +63,32 @@
             .header .header-left {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 6mm;
             }
             
             .header h1 {
-                font-size: 20px !important;
+                font-size: 18pt !important;
                 margin: 0;
             }
             
             .document-type-display {
-                font-size: 18px !important;
+                font-size: 16pt !important;
             }
             
             .header .order-number {
                 position: static !important;
                 transform: none !important;
                 background: transparent !important;
-                padding: 2px 6px !important;
+                padding: 0 !important;
                 white-space: nowrap;
             }
             
             .header .order-number input {
-                font-size: 13px !important;
+                font-size: 11pt !important;
                 width: auto !important;
-                min-width: 160px;
+                min-width: 140pt;
+                border: none !important;
+                background: transparent !important;
             }
             
             table {
@@ -90,86 +96,92 @@
             }
             
             .info-table td {
-                height: 18px !important;
-                padding: 2px 4px !important;
-                font-size: 9px !important;
+                height: 16pt !important;
+                padding: 1pt 3pt !important;
+                font-size: 8pt !important;
             }
             
             .product-table th {
-                padding: 4px 2px !important;
-                font-size: 10px !important;
+                padding: 3pt 2pt !important;
+                font-size: 9pt !important;
                 border: 1px solid #000 !important;
             }
             
             .product-table td {
-                height: 18px !important;
-                padding: 2px !important;
-                font-size: 9px !important;
+                height: 16pt !important;
+                padding: 1pt !important;
+                font-size: 8pt !important;
                 border: 1px solid #000 !important;
             }
             
             .product-table tbody tr {
-                height: 18px !important;
+                height: 16pt !important;
             }
             
             .product-table tfoot td {
-                height: 20px !important;
+                height: 18pt !important;
             }
             
             .signature-section {
                 page-break-inside: avoid;
-                margin-top: 3px !important;
-                gap: 5px !important;
+                margin-top: 2mm !important;
+                gap: 3mm !important;
             }
             
             .signature-box {
-                padding: 4px !important;
-                font-size: 9px !important;
+                padding: 3mm !important;
+                font-size: 8pt !important;
             }
             
             .signature-line, .signature-stamp {
-                height: 18px !important;
-                margin: 3px 0 !important;
+                height: 16pt !important;
+                margin: 2pt 0 !important;
             }
             
             .payment-table td {
-                height: 18px !important;
-                padding: 2px 4px !important;
-                font-size: 9px !important;
+                height: 16pt !important;
+                padding: 1pt 3pt !important;
+                font-size: 8pt !important;
             }
             
             .terms, .agreement {
-                font-size: 8px !important;
-                padding: 4px !important;
-                margin-top: 2px !important;
-                line-height: 1.2 !important;
+                font-size: 7pt !important;
+                padding: 2pt 3pt !important;
+                margin-top: 1mm !important;
+                line-height: 1.15 !important;
             }
             
             .notice {
-                font-size: 8px !important;
-                padding: 4px !important;
-                margin-bottom: 2px !important;
-                line-height: 1.2 !important;
+                font-size: 7pt !important;
+                padding: 2pt 3pt !important;
+                margin-bottom: 1mm !important;
+                line-height: 1.15 !important;
             }
             
             .input-field {
-                padding: 0px !important;
+                padding: 0 !important;
             }
             
             .delivery-container {
-                font-size: 9px !important;
+                font-size: 8pt !important;
             }
             
             .amount-container {
-                font-size: 9px !important;
+                font-size: 8pt !important;
             }
             
             .payment-section {
-                margin-top: 4px !important;
+                margin-top: 2mm !important;
             }
             
             .signature-section + .agreement {
-                margin-top: 3px !important;
+                margin-top: 2mm !important;
+            }
+            
+            /* 隐藏任何可能导致分页的元素 */
+            .form-container::before,
+            .form-container::after {
+                display: none !important;
             }
         }
         
