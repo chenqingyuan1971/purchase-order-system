@@ -1535,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -2046,12 +2046,20 @@
                 const docTypeText = document.querySelector('.doc-type-text').textContent.replace('（', '').replace('）', '');
                 data.docType = docTypeText;
                 
-                // 获取或生成订单ID（包含文档类型，确保预算和结算保存为不同记录）
+                // 获取购货方名称，用于生成项目唯一标识
+                const purchaserName = data.purchaser ? data.purchaser.trim() : '';
+                
+                // 生成项目唯一标识（购货方+文档类型），确保同一个项目的多次保存只更新同一个文件
+                const projectKey = purchaserName + '_' + docTypeText;
+                
+                // 获取或生成订单ID（订单号只在项目内部使用，不作为文件唯一标识）
                 const orderId = data.orderNumber || 'ORD' + Date.now();
                 
-                // 发送到后端
+                // 发送到后端（使用projectKey确保去重）
                 const response = await Api.saveOrder({
                     orderId: orderId,
+                    projectKey: projectKey,
+                    purchaserName: purchaserName,
                     docType: docTypeText,
                     creatorName: currentUser?.name || currentUser?.email?.split('@')[0] || '用户',
                     data: data
