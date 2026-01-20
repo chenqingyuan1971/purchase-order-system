@@ -1506,7 +1506,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -2029,7 +2029,7 @@
                 });
                 
                 console.log('保存订单响应:', response);
-                showToast(`订单${docType === '预算' ? '（预算）' : '（结算）'}保存成功！`, 'success');
+                showToast(`订单${docTypeText === '预算' ? '（预算）' : '（结算）'}保存成功！`, 'success');
                 
             } catch (error) {
                 console.error('保存订单失败:', error);
