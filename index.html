@@ -1535,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -1926,13 +1926,62 @@
                 const order = orders.find(o => (o._id || o.id) === orderId);
                 
                 if (order) {
+                    // 获取订单的文档类型
+                    const orderDocType = order.docType || '预算';
+                    
+                    // 先恢复文档类型状态（这会更新单号格式和付款标签）
+                    restoreDocTypeState(orderDocType);
+                    
+                    // 填充表单数据
                     fillFormWithData(order.data);
+                    
+                    // 恢复创建人信息（如果有）
+                    if (order.creatorName) {
+                        const creatorInput = document.getElementById('creator');
+                        if (creatorInput) {
+                            creatorInput.value = order.creatorName;
+                        }
+                    }
+                    
                     toggleHistoryDrawer();
-                    showToast('订单加载成功！', 'success');
+                    showToast(`订单加载成功！(${orderDocType})`, 'success');
                 }
             } catch (error) {
                 console.error('加载订单失败:', error);
                 showToast('加载订单失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 恢复文档类型状态（预算/结算）
+        function restoreDocTypeState(type) {
+            const docTypeText = document.querySelector('.doc-type-text');
+            const orderNumberInput = document.getElementById('orderNumber');
+            const paymentLabel = document.getElementById('paymentLabel');
+            
+            // 更新文档类型显示
+            if (docTypeText) {
+                docTypeText.textContent = `（${type}）`;
+            }
+            
+            // 更新单号格式和付款标签
+            if (type === '结算') {
+                // 在单号后添加（结）
+                if (orderNumberInput && orderNumberInput.value && !orderNumberInput.value.includes('（结）')) {
+                    orderNumberInput.value += '（结）';
+                }
+                // 更改付款标签
+                if (paymentLabel) {
+                    paymentLabel.textContent = '已付款金额';
+                }
+            } else {
+                // 移除单号中的（结）
+                if (orderNumberInput && orderNumberInput.value) {
+                    orderNumberInput.value = orderNumberInput.value.replace('（结）', '');
+                }
+                // 恢复付款标签
+                if (paymentLabel) {
+                    paymentLabel.textContent = '本次付款金额';
+                }
             }
         }
         
@@ -1960,6 +2009,11 @@
                 }
             });
             
+            // 特殊处理：如果保存的数据中有totalAmountNumber但没有totalAmount，手动同步
+            if (data.totalAmountNumber && !data.totalAmount) {
+                document.getElementById('totalAmount').value = data.totalAmountNumber;
+            }
+            
             // 如果有商品行数据
             if (data.productItems) {
                 const rows = document.querySelectorAll('.product-table tbody tr');
@@ -1977,9 +2031,12 @@
                 });
             }
             
-            // 重新计算总价
+            // 重新计算总价和余额（确保数据一致）
             if (typeof calculateGrandTotal === 'function') {
                 calculateGrandTotal();
+            }
+            if (typeof calculateBalance === 'function') {
+                calculateBalance();
             }
         }
         
