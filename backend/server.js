@@ -40,6 +40,8 @@ const User = mongoose.model('User', userSchema);
 const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     orderId: { type: String, required: true },
+    docType: { type: String, default: '预算' },
+    creatorName: { type: String, default: '未知' },
     data: { type: Object, required: true },
     createdAt: { type: Date, default: Date.now }
 });
@@ -252,7 +254,7 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
 // 创建或更新订单
 app.post('/api/orders', authenticateToken, async (req, res) => {
     try {
-        const { orderId, data } = req.body;
+        const { orderId, data, docType, creatorName } = req.body;
         
         if (!orderId || !data) {
             return res.status(400).json({ message: '请提供订单ID和订单数据' });
@@ -267,6 +269,8 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
         if (order) {
             // 更新现有订单
             order.data = data;
+            order.docType = docType || '预算';
+            order.creatorName = creatorName || req.user.name || '未知';
             order.createdAt = new Date();
             await order.save();
             
@@ -276,6 +280,8 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
             order = new Order({
                 userId: req.user.userId,
                 orderId: orderId,
+                docType: docType || '预算',
+                creatorName: creatorName || req.user.name || '未知',
                 data: data
             });
             await order.save();
@@ -288,6 +294,8 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
             order: {
                 id: order._id,
                 orderId: order.orderId,
+                docType: order.docType,
+                creatorName: order.creatorName,
                 createdAt: order.createdAt
             }
         });
