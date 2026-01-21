@@ -14,15 +14,32 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 // 中间件
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // 增加JSON解析限制
 
 // MongoDB 连接（使用 MongoDB Atlas 或本地 MongoDB）
 // 在 Render.com 环境中，建议使用 MongoDB Atlas 免费层
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/purchase-order-system';
 
-mongoose.connect(MONGODB_URI)
+// 连接选项
+const mongooseOptions = {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+};
+
+// 连接数据库
+mongoose.connect(MONGODB_URI, mongooseOptions)
     .then(() => console.log('✓ MongoDB 连接成功'))
     .catch(err => console.error('MongoDB 连接失败:', err));
+
+// 监听连接事件
+mongoose.connection.on('error', (err) => {
+    console.error('MongoDB 连接错误:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB 连接已断开');
+});
 
 // ==================== 数据模型 ====================
 
@@ -242,9 +259,16 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 // 获取用户的所有订单
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
+        // 检查数据库连接状态
+        if (mongoose.connection.readyState !== 1) {
+            console.error('数据库未连接，连接状态:', mongoose.connection.readyState);
+            return res.status(500).json({ message: '数据库连接失败' });
+        }
+        
         const orders = await Order.find({ userId: req.user.userId })
             .sort({ createdAt: -1 })
-            .select('-__v');
+            .select('-__v')
+            .limit(100); // 限制返回数量
         
         console.log(`✓ 获取订单列表: ${req.user.email} (${orders.length}个订单)`);
         
@@ -258,22 +282,34 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
 // 创建新订单（每次保存都创建新版本）
 app.post('/api/orders', authenticateToken, async (req, res) => {
     try {
+        // 检查数据库连接状态
+        if (mongoose.connection.readyState !== 1) {
+            console.error('数据库未连接，连接状态:', mongoose.connection.readyState);
+            return res.status(500).json({ message: '数据库连接失败，请稍后重试' });
+        }
+        
         const { orderId, projectKey, purchaserName, docType, creatorName, data } = req.body;
 
         if (!projectKey || !data) {
             return res.status(400).json({ message: '缺少必要参数' });
         }
 
+        // 验证数据
+        if (typeof data !== 'object') {
+            return res.status(400).json({ message: '数据格式错误' });
+        }
+
         // 每次保存都创建新记录（允许同一项目有多个版本）
         const order = new Order({
             userId: req.user.userId,
-            orderId: orderId,
+            orderId: orderId || 'ORD' + Date.now(),
             projectKey: projectKey,
             purchaserName: purchaserName || '',
             docType: docType || '预算',
             creatorName: creatorName || req.user.name || '未知',
             data: data
         });
+        
         await order.save();
 
         console.log(`✓ 创建新版本: ${req.user.email} - ${projectKey} - ${order._id}`);
@@ -293,7 +329,17 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
 
     } catch (error) {
         console.error('保存订单错误:', error);
-        res.status(500).json({ message: '服务器错误，保存订单失败' });
+        
+        // 发送更详细的错误信息
+        if (error.name === 'ValidationError') {
+            res.status(400).json({ message: '数据验证失败: ' + error.message });
+        } else if (error.name === 'CastError') {
+            res.status(400).json({ message: '数据类型错误: ' + error.message });
+        } else if (error.code === 11000) {
+            res.status(400).json({ message: '记录重复，请刷新后重试' });
+        } else {
+            res.status(500).json({ message: '服务器错误，保存订单失败' });
+        }
     }
 });
 
@@ -341,6 +387,12 @@ app.listen(PORT, () => {
 // 优雅关闭
 process.on('SIGTERM', async () => {
     console.log('收到 SIGTERM 信号，正在关闭服务器...');
+    await mongoose.connection.close();
+    process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+    console.log('收到 SIGINT 信号，正在关闭服务器...');
     await mongoose.connection.close();
     process.exit(0);
 });
