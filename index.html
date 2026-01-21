@@ -1315,15 +1315,9 @@
                 <td>订货日期</td>
                 <td><input type="date" class="input-field" id="orderDate"></td>
                 <td>送货时间</td>
-                <td><input type="text" class="input-field" id="deliveryDate" list="deliveryDateList" placeholder="请选择或输入"></td>
+                <td><input type="date" class="input-field" id="deliveryDate"></td>
             </tr>
         </table>
-        
-        <datalist id="deliveryDateList">
-            <option value="安装后">
-            <option value="协商确定">
-            <option value="付款后三天内">
-        </datalist>
         
         <table class="product-table">
             <thead>
@@ -1541,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -1880,6 +1874,11 @@
             const orderDate = order.data?.orderDate || '-';
             const deliveryDate = order.data?.deliveryDate || '-';
             
+            // 判断送货时间是否为有效日期
+            const isDeliveryDateValid = deliveryDate && /^\d{4}-\d{2}-\d{2}$/.test(deliveryDate);
+            const deliveryDateDisplay = isDeliveryDateValid ? deliveryDate : 
+                `<span style="background: #F0F9EB; color: #67C23A; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${deliveryDate}</span>`;
+            
             // 获取产品型号列表
             let productModels = '';
             if (order.data?.productItems && order.data.productItems.length > 0) {
@@ -1907,7 +1906,7 @@
                     </div>
                     <div class="history-detail-row">
                         <span class="history-detail-label">🚚 送货时间：</span>
-                        <span class="history-detail-value">${deliveryDate}</span>
+                        <span class="history-detail-value">${deliveryDateDisplay}</span>
                     </div>
                     <div class="history-detail-row">
                         <span class="history-detail-label">📦 产品型号：</span>
