@@ -1110,17 +1110,17 @@
             font-size: 14px;
         }
 
-        /* ==================== 单列列表布局（紧凑） ==================== */
+        /* ==================== 单列列表布局（超紧凑） ==================== */
         .history-grid {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .history-item {
             background: #f8f9fa;
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px 12px;
             transition: all 0.2s ease;
             border: 2px solid transparent;
             border-left: 4px solid #3498db;
@@ -1144,7 +1144,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .history-item-title {
@@ -1154,40 +1154,32 @@
         }
 
         .history-item-date {
-            font-size: 11px;
+            font-size: 10px;
             color: #95a5a6;
-        }
-
-        .history-item-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 6px;
-        }
-
-        .history-item-info span {
-            font-size: 12px;
-            color: #7f8c8d;
         }
 
         .history-item-amount {
             font-weight: bold;
             color: #e74c3c;
-            font-size: 17px;
+            font-size: 18px;
+            margin: 6px 0;
+            padding: 4px 0;
+            border-top: 1px dashed #e0e0e0;
+            border-bottom: 1px dashed #e0e0e0;
         }
 
         .history-item-actions {
             display: flex;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
         .btn-history-action {
             flex: 1;
-            padding: 8px;
+            padding: 6px 8px;
             border: none;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 5px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -1204,25 +1196,28 @@
         }
 
         .btn-history-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .history-detail-row {
             display: flex;
             align-items: center;
-            margin-top: 4px;
-            font-size: 12px;
+            margin-top: 3px;
+            font-size: 11px;
         }
 
         .history-detail-label {
             color: #95a5a6;
-            margin-right: 6px;
-            min-width: 65px;
+            margin-right: 5px;
+            min-width: 60px;
         }
 
         .history-detail-value {
             color: #2c3e50;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .loading-spinner {
@@ -2158,14 +2153,12 @@
             // 获取文档类型（预算/结算）
             const docType = order.data?.docType || '预算';
 
-            // 获取订单日期和送货时间
+            // 获取订单日期和送货时间（合并显示）
             const orderDate = order.data?.orderDate || '-';
             const deliveryDate = order.data?.deliveryDate || '-';
-
-            // 判断送货时间是否为有效日期
             const isDeliveryDateValid = deliveryDate && /^\d{4}-\d{2}-\d{2}$/.test(deliveryDate);
             const deliveryDateDisplay = isDeliveryDateValid ? deliveryDate :
-                `<span style="background: #F0F9EB; color: #67C23A; padding: 2px 6px; border-radius: 3px; font-size: 11px;">${deliveryDate}</span>`;
+                `<span style="background: #F0F9EB; color: #67C23A; padding: 1px 5px; border-radius: 3px; font-size: 10px;">${deliveryDate}</span>`;
 
             // 获取产品型号列表
             let productModels = '';
@@ -2187,25 +2180,18 @@
 
             item.innerHTML = `
                 <div class="history-item-header">
-                    <div class="history-item-title">${customerName} <span style="font-size: 12px; color: ${docType === '结算' ? '#27ae60' : '#3498db'}; margin-left: 5px;">[${docType}]</span></div>
+                    <div class="history-item-title">${customerName} <span style="font-size: 11px; color: ${docType === '结算' ? '#27ae60' : '#3498db'}; margin-left: 5px;">[${docType}]</span></div>
                     <div class="history-item-date">${date}</div>
                 </div>
                 <div class="history-detail-row">
-                    <span class="history-detail-label">📅 订货日期：</span>
-                    <span class="history-detail-value">${orderDate}</span>
+                    <span class="history-detail-label">📅 订货/送货：</span>
+                    <span class="history-detail-value">${orderDate} / ${deliveryDateDisplay}</span>
                 </div>
                 <div class="history-detail-row">
-                    <span class="history-detail-label">🚚 送货时间：</span>
-                    <span class="history-detail-value">${deliveryDateDisplay}</span>
+                    <span class="history-detail-label">📦 产品/创建：</span>
+                    <span class="history-detail-value" title="${productModels} · ${creatorName}">${productModels} · ${creatorName}</span>
                 </div>
-                <div class="history-detail-row">
-                    <span class="history-detail-label">📦 产品型号：</span>
-                    <span class="history-detail-value" title="${productModels}">${productModels}</span>
-                </div>
-                <div class="history-item-info">
-                    <span>👤 ${creatorName}</span>
-                    <span class="history-item-amount">¥${amountFormatted}</span>
-                </div>
+                <div class="history-item-amount">💰 ¥${amountFormatted}</div>
                 <div class="history-item-actions">
                     <button class="btn-history-action btn-load" onclick="loadOrder('${order._id || order.id}')">📂 加载</button>
                     <button class="btn-history-action btn-delete" onclick="deleteOrder('${order._id || order.id}')">🗑️ 删除</button>
