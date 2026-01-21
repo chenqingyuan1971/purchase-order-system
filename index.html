@@ -1409,9 +1409,18 @@
         
         <div class="terms">
             <strong>其他约定：</strong><br>
-            1. 货款余额应由购货方在<input type="text" class="input-field" id="balanceDueDate" style="width: 200px; border-bottom: 1px solid #000; display: inline-block;" placeholder="请填写日期">付清。<br>
+            1. 货款余额应由购货方在<input type="text" class="input-field" id="balanceDueDate" style="width: 200px; border-bottom: 1px solid #000; display: inline-block;" placeholder="请选择或填写付款条件" list="balanceDueDateOptions">付清。<br>
             2. 本单实售合计金额中已包含上门检测、测量、设计、出图等相关费用。
         </div>
+
+        <!-- 付款条件快捷选项列表 -->
+        <datalist id="balanceDueDateOptions">
+            <option value="安装后">
+            <option value="协商确定">
+            <option value="验收后三天内">
+            <option value="付款后">
+            <option value="月底结清">
+        </datalist>
         
         <div class="signature-section">
             <div class="signature-box">
@@ -1534,8 +1543,12 @@
     
     <script>
         // ==================== 后端API配置 ====================
-        // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        // 智能检测当前环境，自动选择API地址
+        // 生产环境使用 Render.com URL，开发环境使用 localhost
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE_URL = isLocalhost
+            ? 'http://localhost:3000/api'
+            : 'https://purchase-order-system.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -2055,7 +2068,7 @@
                     remarksInput.value = defaultRemarks;
                 }
             }
-            
+
             // 特殊处理：确保所有金额数字显示两位小数
             const amountFields = ['totalAmount', 'totalAmountNumber', 'currentPaymentNumber', 'balanceNumber'];
             amountFields.forEach(fieldId => {
