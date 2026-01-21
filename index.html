@@ -1650,6 +1650,7 @@
         let currentUser = null;
         let isLoadingHistory = false; // 标记是否正在加载历史数据
         let hasUnsavedChanges = false; // 标记是否有未保存的更改
+        let currentLoadedOrderId = null; // 当前加载的订单ID
         
         // ==================== 认证相关函数 ====================
         function showAuthModal(tab) {
@@ -1995,7 +1996,10 @@
                     
                     // 取消加载模式
                     isLoadingHistory = false;
-                    
+
+                    // 记录当前加载的订单ID，用于后续更新
+                    currentLoadedOrderId = order._id || order.id;
+
                     // 加载文件后清除未保存标记
                     hasUnsavedChanges = false;
                     
@@ -2213,7 +2217,12 @@
 
                 console.log('保存订单响应:', response);
                 showToast(`订单${docTypeText === '预算' ? '（预算）' : '（结算）'}保存成功！`, 'success');
-                
+
+                // 更新当前加载的订单ID（如果是更新操作）
+                if (response.order && response.order.id) {
+                    currentLoadedOrderId = response.order.id;
+                }
+
                 // 保存成功后清除未保存标记
                 hasUnsavedChanges = false;
                 
@@ -2439,21 +2448,79 @@
             document.getElementById('balanceChinese').value = numberToChinese(balance);
         }
 
-        // 不保存退出
+        // 不保存退出 - 丢弃当前更改，打开新文件
         function exitWithoutSave() {
-            // 如果从未保存过（全新文档），给出提示
-            if (!hasUnsavedChanges) {
-                showToast('没有未保存的更改', 'info');
-                return;
+            // 无论是否有未保存的更改，点击"不保存退出"都表示要丢弃当前内容
+            // 如果已有未保存的更改，给出警告；如果没有，直接重置
+
+            if (hasUnsavedChanges) {
+                if (!confirm('确定要不保存退出吗？当前页面中的所有更改将会丢失。\n\n注意：云端已保存的数据不会受影响。')) {
+                    return;
+                }
             }
 
-            if (confirm('确定要不保存退出吗？云端已保存的内容不会丢失，只会丢弃当前页面中的未保存更改。')) {
-                // 清除未保存标记，防止触发自动保存
-                hasUnsavedChanges = false;
+            // 重置所有表单数据为初始状态
+            resetFormToDefault();
 
-                // 刷新页面恢复到最后保存的状态
-                window.location.reload();
-            }
+            // 重置未保存标记
+            hasUnsavedChanges = false;
+
+            showToast('已打开新文件', 'success');
+        }
+
+        // 重置表单为默认状态
+        function resetFormToDefault() {
+            // 重置购货方信息
+            const fieldsToReset = ['purchaser', 'buyerContact', 'orderNumber', 'receiverName', 'receiverPhone', 'receiverAddress', 'totalAmountChinese', 'totalAmountNumber', 'currentPaymentNumber', 'balanceChinese', 'balanceNumber', 'paymentMethod', 'balanceDueDate', 'remarks'];
+
+            fieldsToReset.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+
+            // 重置商品表格
+            const rows = document.querySelectorAll('.product-table tbody tr');
+            rows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0]) inputs[0].value = index === 0 ? 'TECH X隔热膜' : ''; // 产品名称
+                if (inputs[1]) inputs[1].value = index === 0 ? '晨曦' : ''; // 型号
+                if (inputs[2]) inputs[2].value = index === 0 ? '1.52m*30m' : ''; // 规格
+                if (inputs[3]) inputs[3].value = index === 0 ? '799' : ''; // 零售价
+                if (inputs[4]) inputs[4].value = ''; // 数量
+                if (inputs[5]) inputs[5].value = index === 0 ? '' : '㎡'; // 单位
+                if (inputs[6]) inputs[6].value = ''; // 合价
+            });
+
+            // 重置合计
+            document.getElementById('totalAmount').value = '0.00';
+            document.getElementById('totalAmountNumber').value = '';
+            document.getElementById('totalAmountChinese').value = '';
+            document.getElementById('currentPaymentNumber').value = '';
+            document.getElementById('balanceNumber').value = '0.00';
+            document.getElementById('balanceChinese').value = '';
+
+            // 重置备注为默认值
+            document.getElementById('remarks').value = '质保期五年，从安装结束之日起算；质保期内非人为和自然灾害原因引起的质量问题、安装问题，由供货方负责维保';
+
+            // 重置文档类型为预算
+            setDocType('budget');
+
+            // 重置当前加载的订单ID
+            currentLoadedOrderId = null;
+
+            // 生成新的订单号
+            const now = new Date();
+            const orderNumber = 'PO' + now.getFullYear() +
+                              String(now.getMonth() + 1).padStart(2, '0') +
+                              String(now.getDate() + 1).padStart(2, '0') +
+                              String(now.getHours()).padStart(2, '0') +
+                              String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('orderNumber').value = orderNumber;
+
+            // 重置默认日期
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = today;
+            document.getElementById('deliveryDate').value = today;
         }
 
         // 按钮功能
@@ -2698,10 +2765,20 @@
             
             // 监听输入变化，设置未保存标记
             document.addEventListener('input', function(event) {
-                if (event.target.tagName === 'INPUT' && event.target.id) {
+                if (event.target.tagName === 'INPUT') {
                     hasUnsavedChanges = true;
                 }
             });
+
+            // 监听表单区域的变化（包括动态添加的行）
+            const formContainer = document.querySelector('.form-container');
+            if (formContainer) {
+                formContainer.addEventListener('change', function(event) {
+                    if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+                        hasUnsavedChanges = true;
+                    }
+                });
+            }
             
             // 点击模态框外部关闭
             document.getElementById('authModal').addEventListener('click', function(event) {
