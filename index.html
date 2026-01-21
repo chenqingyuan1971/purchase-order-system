@@ -1110,17 +1110,17 @@
             font-size: 14px;
         }
 
-        /* ==================== 紧凑网格布局 ==================== */
+        /* ==================== 单列列表布局 ==================== */
         .history-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .history-item {
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 12px;
+            padding: 15px;
             transition: all 0.2s ease;
             border: 2px solid transparent;
             border-left: 4px solid #3498db;
@@ -1129,7 +1129,7 @@
         .history-item:hover {
             border-color: #3498db;
             box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
-            transform: translateY(-2px);
+            transform: translateX(3px);
         }
 
         .history-item.type-budget {
@@ -1144,24 +1144,18 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8px;
-            gap: 5px;
+            margin-bottom: 10px;
         }
 
         .history-item-title {
             font-weight: bold;
-            font-size: 13px;
+            font-size: 15px;
             color: #2c3e50;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 120px;
         }
 
         .history-item-date {
-            font-size: 11px;
+            font-size: 12px;
             color: #95a5a6;
-            white-space: nowrap;
         }
 
         .history-item-info {
@@ -1172,28 +1166,28 @@
         }
 
         .history-item-info span {
-            font-size: 12px;
+            font-size: 13px;
             color: #7f8c8d;
         }
 
         .history-item-amount {
             font-weight: bold;
             color: #e74c3c;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .history-item-actions {
             display: flex;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 12px;
         }
 
         .btn-history-action {
             flex: 1;
-            padding: 8px 5px;
+            padding: 10px;
             border: none;
-            border-radius: 6px;
-            font-size: 12px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -1210,8 +1204,25 @@
         }
 
         .btn-history-action:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .history-detail-row {
+            display: flex;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        .history-detail-label {
+            color: #95a5a6;
+            margin-right: 8px;
+            min-width: 70px;
+        }
+
+        .history-detail-value {
+            color: #2c3e50;
         }
 
         .loading-spinner {
@@ -1219,7 +1230,7 @@
             text-align: center;
             padding: 40px;
         }
-        
+
         .loading-spinner.active {
             display: block;
         }
@@ -2147,6 +2158,27 @@
             // 获取文档类型（预算/结算）
             const docType = order.data?.docType || '预算';
 
+            // 获取订单日期和送货时间
+            const orderDate = order.data?.orderDate || '-';
+            const deliveryDate = order.data?.deliveryDate || '-';
+
+            // 判断送货时间是否为有效日期
+            const isDeliveryDateValid = deliveryDate && /^\d{4}-\d{2}-\d{2}$/.test(deliveryDate);
+            const deliveryDateDisplay = isDeliveryDateValid ? deliveryDate :
+                `<span style="background: #F0F9EB; color: #67C23A; padding: 2px 6px; border-radius: 3px; font-size: 11px;">${deliveryDate}</span>`;
+
+            // 获取产品型号列表
+            let productModels = '';
+            if (order.data?.productItems && order.data.productItems.length > 0) {
+                const models = order.data.productItems
+                    .filter(item => item.model && item.model.trim() !== '')
+                    .map(item => item.model.trim());
+                if (models.length > 0) {
+                    productModels = models.join('、');
+                }
+            }
+            if (!productModels) productModels = '无产品信息';
+
             // 获取创建人
             const creatorName = order.creatorName || order.data?.creatorName || '未知';
 
@@ -2155,16 +2187,28 @@
 
             item.innerHTML = `
                 <div class="history-item-header">
-                    <div class="history-item-title" title="${customerName}">${customerName}</div>
+                    <div class="history-item-title">${customerName} <span style="font-size: 12px; color: ${docType === '结算' ? '#27ae60' : '#3498db'}; margin-left: 5px;">[${docType}]</span></div>
                     <div class="history-item-date">${date}</div>
                 </div>
+                <div class="history-detail-row">
+                    <span class="history-detail-label">📅 订货日期：</span>
+                    <span class="history-detail-value">${orderDate}</span>
+                </div>
+                <div class="history-detail-row">
+                    <span class="history-detail-label">🚚 送货时间：</span>
+                    <span class="history-detail-value">${deliveryDateDisplay}</span>
+                </div>
+                <div class="history-detail-row">
+                    <span class="history-detail-label">📦 产品型号：</span>
+                    <span class="history-detail-value" title="${productModels}">${productModels}</span>
+                </div>
                 <div class="history-item-info">
-                    <span>${docType} · ${creatorName}</span>
+                    <span>👤 ${creatorName}</span>
                     <span class="history-item-amount">¥${amountFormatted}</span>
                 </div>
                 <div class="history-item-actions">
-                    <button class="btn-history-action btn-load" onclick="loadOrder('${order._id || order.id}')">加载</button>
-                    <button class="btn-history-action btn-delete" onclick="deleteOrder('${order._id || order.id}')">删除</button>
+                    <button class="btn-history-action btn-load" onclick="loadOrder('${order._id || order.id}')">📂 加载</button>
+                    <button class="btn-history-action btn-delete" onclick="deleteOrder('${order._id || order.id}')">🗑️ 删除</button>
                 </div>
             `;
 
