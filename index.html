@@ -413,7 +413,18 @@
         .btn-image {
             background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
         }
-        
+
+        .btn-exit {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #495057 !important;
+            border: 2px solid #dee2e6;
+        }
+
+        .btn-exit:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            border-color: #adb5bd;
+        }
+
         /* ==================== 表单容器 ==================== */
         .form-container {
             background: white;
@@ -2354,8 +2365,15 @@
         function updateModelPrice(input) {
             const modelValue = input.value.trim();
             const row = input.closest('tr');
+            const specInput = row.querySelector('td:nth-child(3) input');
             const priceInput = row.querySelector('td:nth-child(4) input');
-            
+
+            // 预设规格：暮语、智幕Pro70、智幕Pro30
+            const modelsWithSpec = ['暮语', '智幕Pro70', '智幕Pro30'];
+            if (modelsWithSpec.includes(modelValue)) {
+                specInput.value = '1.52m*30m';
+            }
+
             if (productPrices[modelValue]) {
                 priceInput.value = productPrices[modelValue];
                 calculateRow(priceInput);
@@ -2423,15 +2441,18 @@
 
         // 不保存退出
         function exitWithoutSave() {
-            if (confirm('确定要不保存退出吗？当前编辑的内容将会丢失。')) {
-                // 清除未保存标记
+            // 如果从未保存过（全新文档），给出提示
+            if (!hasUnsavedChanges) {
+                showToast('没有未保存的更改', 'info');
+                return;
+            }
+
+            if (confirm('确定要不保存退出吗？云端已保存的内容不会丢失，只会丢弃当前页面中的未保存更改。')) {
+                // 清除未保存标记，防止触发自动保存
                 hasUnsavedChanges = false;
-                // 返回上一页或刷新页面
-                if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
-                    window.history.back();
-                } else {
-                    window.location.reload();
-                }
+
+                // 刷新页面恢复到最后保存的状态
+                window.location.reload();
             }
         }
 
