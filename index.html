@@ -1373,7 +1373,7 @@
                                 <input type="text" class="input-field" placeholder="大写金额" id="totalAmountChinese">
                             </div>
                             <div class="amount-number">
-                                小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="totalAmountNumber" onchange="updateChinese(this)">
+                                小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="totalAmountNumber" onchange="updateChinese(this); calculateBalance();">
                             </div>
                         </div>
                     </td>
@@ -1535,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -1624,6 +1624,7 @@
         // ==================== 全局状态管理 ====================
         let currentAuthTab = 'login';
         let currentUser = null;
+        let isLoadingHistory = false; // 标记是否正在加载历史数据
         
         // ==================== 认证相关函数 ====================
         function showAuthModal(tab) {
@@ -1932,6 +1933,9 @@
                     // 先恢复文档类型状态（这会更新单号格式和付款标签）
                     restoreDocTypeState(orderDocType);
                     
+                    // 标记为加载历史数据模式，避免重新计算导致金额变化
+                    isLoadingHistory = true;
+                    
                     // 填充表单数据
                     fillFormWithData(order.data);
                     
@@ -1942,6 +1946,9 @@
                             creatorInput.value = order.creatorName;
                         }
                     }
+                    
+                    // 取消加载模式
+                    isLoadingHistory = false;
                     
                     toggleHistoryDrawer();
                     showToast(`订单加载成功！(${orderDocType})`, 'success');
@@ -2284,6 +2291,11 @@
         
         // 计算总计
         function calculateGrandTotal() {
+            // 如果正在加载历史数据，不重新计算，保持保存的值不变
+            if (isLoadingHistory) {
+                return;
+            }
+            
             const totalInputs = document.querySelectorAll('.product-table tbody tr td:last-child input');
             let grandTotal = 0;
             
