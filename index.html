@@ -2178,10 +2178,18 @@
                 const projectKey = purchaserName
                     ? purchaserName + '_' + docTypeText
                     : (data.orderNumber || 'ORD' + Date.now()) + '_' + docTypeText;
-                
+
                 // 获取或生成订单ID（订单号只在项目内部使用，不作为文件唯一标识）
                 const orderId = data.orderNumber || 'ORD' + Date.now();
-                
+
+                // 调试日志
+                console.log('=== 保存订单调试信息 ===');
+                console.log('购货方:', purchaserName || '(空)');
+                console.log('订单号:', orderId);
+                console.log('文档类型:', docTypeText);
+                console.log('项目标识(projectKey):', projectKey);
+                console.log('=========================');
+
                 // 发送到后端（使用projectKey确保去重）
                 const response = await Api.saveOrder({
                     orderId: orderId,
@@ -2191,7 +2199,7 @@
                     creatorName: currentUser?.name || currentUser?.email?.split('@')[0] || '用户',
                     data: data
                 });
-                
+
                 console.log('保存订单响应:', response);
                 showToast(`订单${docTypeText === '预算' ? '（预算）' : '（结算）'}保存成功！`, 'success');
                 
