@@ -300,10 +300,13 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
         }
 
         // UPSERT逻辑：查找是否存在相同 userId + projectKey 的记录
-        const existingOrder = await Order.findOne({
-            userId: req.user.userId,
-            projectKey: projectKey
-        });
+        // 注意：如果 projectKey 为空或无效（如 "_预算"），则跳过查找，直接创建新记录
+        const existingOrder = projectKey && projectKey.trim() !== '' && !projectKey.startsWith('_')
+            ? await Order.findOne({
+                userId: req.user.userId,
+                projectKey: projectKey
+            })
+            : null;
 
         if (existingOrder) {
             // 更新现有记录
