@@ -2172,9 +2172,12 @@
                 
                 // 获取购货方名称，用于生成项目唯一标识
                 const purchaserName = data.purchaser ? data.purchaser.trim() : '';
-                
+
                 // 生成项目唯一标识（购货方+文档类型），确保同一个项目的多次保存只更新同一个文件
-                const projectKey = purchaserName + '_' + docTypeText;
+                // 如果购货方为空，使用订单号作为唯一标识
+                const projectKey = purchaserName
+                    ? purchaserName + '_' + docTypeText
+                    : (data.orderNumber || 'ORD' + Date.now()) + '_' + docTypeText;
                 
                 // 获取或生成订单ID（订单号只在项目内部使用，不作为文件唯一标识）
                 const orderId = data.orderNumber || 'ORD' + Date.now();
