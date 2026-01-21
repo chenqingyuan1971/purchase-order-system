@@ -1241,10 +1241,10 @@
     
     <!-- 操作按钮 -->
     <div class="action-buttons no-print">
+        <button class="btn btn-exit" onclick="exitWithoutSave()">🚪 不保存退出</button>
         <button class="btn btn-save" onclick="handleSaveOrder()">💾 保存到云端</button>
         <button class="btn btn-new" onclick="handleSaveAndNew()">➕ 保存并新建</button>
-        <button class="btn btn-print" onclick="printForm()">🖨️ 打印表单</button>
-        <button class="btn btn-export" onclick="exportToPDF()">📄 导出PDF</button>
+        <button class="btn btn-print" onclick="printForm()">🖨️ 打印或导出PDF</button>
         <button class="btn btn-image" onclick="exportToImage()">🖼️ 导出图片</button>
     </div>
     
@@ -2331,7 +2331,23 @@
         
         // 更新产品价格（根据商品名称）
         function updateProductPrice(input) {
-            // 这个函数暂时不做处理，主要通过型号来更新价格
+            const productName = input.value.trim();
+            const row = input.closest('tr');
+            const specInput = row.querySelector('td:nth-child(3) input');
+            const priceInput = row.querySelector('td:nth-child(4) input');
+
+            // 预设规格：暮语、智幕Pro70、智幕Pro30
+            const productsWithSpec = ['暮语', '智幕Pro70', '智幕Pro30'];
+            if (productsWithSpec.includes(productName)) {
+                specInput.value = '1.52m*30m';
+            }
+
+            // 预设价格：隔热膜安装费
+            if (productName === '隔热膜安装费') {
+                priceInput.value = 30;
+                calculateRow(priceInput);
+                showToast(`已自动设置${productName}的价格：¥30`, 'info');
+            }
         }
         
         // 更新型号价格（根据型号）
@@ -2404,7 +2420,21 @@
             document.getElementById('balanceNumber').value = balance.toFixed(2);
             document.getElementById('balanceChinese').value = numberToChinese(balance);
         }
-        
+
+        // 不保存退出
+        function exitWithoutSave() {
+            if (confirm('确定要不保存退出吗？当前编辑的内容将会丢失。')) {
+                // 清除未保存标记
+                hasUnsavedChanges = false;
+                // 返回上一页或刷新页面
+                if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+                    window.history.back();
+                } else {
+                    window.location.reload();
+                }
+            }
+        }
+
         // 按钮功能
         function saveOrder() {
             try {
