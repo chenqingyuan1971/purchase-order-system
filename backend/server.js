@@ -279,7 +279,7 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
     }
 });
 
-// 创建新订单（每次保存都创建新版本）
+// 创建或更新订单（同一项目只保留一个文件）
 app.post('/api/orders', authenticateToken, async (req, res) => {
     try {
         // 检查数据库连接状态
@@ -287,7 +287,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
             console.error('数据库未连接，连接状态:', mongoose.connection.readyState);
             return res.status(500).json({ message: '数据库连接失败，请稍后重试' });
         }
-        
+
         const { orderId, projectKey, purchaserName, docType, creatorName, data } = req.body;
 
         if (!projectKey || !data) {
@@ -299,37 +299,70 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
             return res.status(400).json({ message: '数据格式错误' });
         }
 
-        // 每次保存都创建新记录（允许同一项目有多个版本）
-        const order = new Order({
+        // UPSERT逻辑：查找是否存在相同 userId + projectKey 的记录
+        const existingOrder = await Order.findOne({
             userId: req.user.userId,
-            orderId: orderId || 'ORD' + Date.now(),
-            projectKey: projectKey,
-            purchaserName: purchaserName || '',
-            docType: docType || '预算',
-            creatorName: creatorName || req.user.name || '未知',
-            data: data
+            projectKey: projectKey
         });
-        
-        await order.save();
 
-        console.log(`✓ 创建新版本: ${req.user.email} - ${projectKey} - ${order._id}`);
-        res.json({
-            message: '订单保存成功（新版本已创建）',
-            isUpdate: false,
-            order: {
-                id: order._id,
-                orderId: order.orderId,
-                projectKey: order.projectKey,
-                purchaserName: order.purchaserName,
-                docType: order.docType,
-                creatorName: order.creatorName,
-                createdAt: order.createdAt
-            }
-        });
+        if (existingOrder) {
+            // 更新现有记录
+            existingOrder.orderId = orderId || existingOrder.orderId;
+            existingOrder.purchaserName = purchaserName || existingOrder.purchaserName;
+            existingOrder.docType = docType || existingOrder.docType;
+            existingOrder.creatorName = creatorName || req.user.name || '未知';
+            existingOrder.data = data;
+            existingOrder.createdAt = new Date(); // 更新时间戳
+
+            await existingOrder.save();
+
+            console.log(`✓ 更新订单: ${req.user.email} - ${projectKey} - ${existingOrder._id}`);
+            res.json({
+                message: '订单保存成功（已更新）',
+                isUpdate: true,
+                order: {
+                    id: existingOrder._id,
+                    orderId: existingOrder.orderId,
+                    projectKey: existingOrder.projectKey,
+                    purchaserName: existingOrder.purchaserName,
+                    docType: existingOrder.docType,
+                    creatorName: existingOrder.creatorName,
+                    createdAt: existingOrder.createdAt
+                }
+            });
+        } else {
+            // 创建新记录
+            const order = new Order({
+                userId: req.user.userId,
+                orderId: orderId || 'ORD' + Date.now(),
+                projectKey: projectKey,
+                purchaserName: purchaserName || '',
+                docType: docType || '预算',
+                creatorName: creatorName || req.user.name || '未知',
+                data: data
+            });
+
+            await order.save();
+
+            console.log(`✓ 创建新订单: ${req.user.email} - ${projectKey} - ${order._id}`);
+            res.json({
+                message: '订单保存成功（新订单已创建）',
+                isUpdate: false,
+                order: {
+                    id: order._id,
+                    orderId: order.orderId,
+                    projectKey: order.projectKey,
+                    purchaserName: order.purchaserName,
+                    docType: order.docType,
+                    creatorName: order.creatorName,
+                    createdAt: order.createdAt
+                }
+            });
+        }
 
     } catch (error) {
         console.error('保存订单错误:', error);
-        
+
         // 发送更详细的错误信息
         if (error.name === 'ValidationError') {
             res.status(400).json({ message: '数据验证失败: ' + error.message });
