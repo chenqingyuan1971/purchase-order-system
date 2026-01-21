@@ -1285,7 +1285,7 @@
         <table class="info-table">
             <tr>
                 <td style="width: 15%;">购货方</td>
-                <td style="width: 35%;"><input type="text" class="input-field" id="buyer"></td>
+                <td style="width: 35%;"><input type="text" class="input-field" id="purchaser"></td>
                 <td style="width: 15%;">购货方联系人/电话</td>
                 <td style="width: 35%;"><input type="text" class="input-field" id="buyerContact"></td>
             </tr>
@@ -1877,7 +1877,7 @@
             item.className = 'history-item';
             
             const date = order.createdAt ? new Date(order.createdAt).toLocaleString('zh-CN') : '未知时间';
-            const customerName = order.data?.buyer || '未命名客户';
+            const customerName = order.data?.purchaser || order.data?.buyer || '未命名客户';
             const totalAmount = order.data?.totalAmountNumber || 0;
             
             // 获取文档类型（预算/结算）
