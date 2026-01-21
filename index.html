@@ -1409,7 +1409,7 @@
         
         <div class="terms">
             <strong>其他约定：</strong><br>
-            1. 货款余额应由购货方在<input type="text" class="input-field" style="width: 200px; border-bottom: 1px solid #000; display: inline-block;">付清。<br>
+            1. 货款余额应由购货方在<input type="text" class="input-field" id="balanceDueDate" style="width: 200px; border-bottom: 1px solid #000; display: inline-block;" placeholder="请填写日期">付清。<br>
             2. 本单实售合计金额中已包含上门检测、测量、设计、出图等相关费用。
         </div>
         
@@ -1535,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
