@@ -1535,7 +1535,7 @@
     <script>
         // ==================== 后端API配置 ====================
         // 请将下面的 URL 替换为您的 Render.com 后端地址
-        const API_BASE_URL = 'https://purchase-order-system.onrender.com/api';
+        const API_BASE_URL = 'https://your-backend-service.onrender.com/api';
         
         // ==================== API工具函数 ====================
         const Api = {
@@ -1625,6 +1625,7 @@
         let currentAuthTab = 'login';
         let currentUser = null;
         let isLoadingHistory = false; // 标记是否正在加载历史数据
+        let hasUnsavedChanges = false; // 标记是否有未保存的更改
         
         // ==================== 认证相关函数 ====================
         function showAuthModal(tab) {
@@ -1922,6 +1923,22 @@
         
         async function loadOrder(orderId) {
             try {
+                // 检查是否有未保存的更改
+                if (hasUnsavedChanges && currentUser) {
+                    // 自动保存当前编辑的内容
+                    try {
+                        await saveOrderToCloud();
+                        showToast('已自动保存当前文件', 'success');
+                    } catch (saveError) {
+                        console.error('自动保存失败:', saveError);
+                        // 询问用户是否继续加载
+                        if (!confirm('自动保存失败，是否继续加载其他文件？当前未保存的更改将会丢失。')) {
+                            return;
+                        }
+                    }
+                    hasUnsavedChanges = false;
+                }
+                
                 const response = await Api.getOrders();
                 const orders = response.orders || response.data || [];
                 const order = orders.find(o => (o._id || o.id) === orderId);
@@ -1949,6 +1966,9 @@
                     
                     // 取消加载模式
                     isLoadingHistory = false;
+                    
+                    // 加载文件后清除未保存标记
+                    hasUnsavedChanges = false;
                     
                     toggleHistoryDrawer();
                     showToast(`订单加载成功！(${orderDocType})`, 'success');
@@ -2020,6 +2040,28 @@
             if (data.totalAmountNumber && !data.totalAmount) {
                 document.getElementById('totalAmount').value = data.totalAmountNumber;
             }
+            
+            // 特殊处理：备注字段 - 如果加载的数据没有备注或备注为空，保留默认备注
+            const remarksInput = document.getElementById('remarks');
+            if (remarksInput) {
+                const defaultRemarks = '质保期五年，从安装结束之日起算；质保期内非人为和自然灾害原因引起的质量问题、安装问题，由供货方负责维保';
+                if (!data.remarks || data.remarks.trim() === '') {
+                    // 如果加载的数据没有备注，恢复默认备注
+                    remarksInput.value = defaultRemarks;
+                }
+            }
+            
+            // 特殊处理：确保所有金额数字显示两位小数
+            const amountFields = ['totalAmount', 'totalAmountNumber', 'currentPaymentNumber', 'balanceNumber'];
+            amountFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && field.value) {
+                    const num = parseFloat(field.value);
+                    if (!isNaN(num)) {
+                        field.value = num.toFixed(2);
+                    }
+                }
+            });
             
             // 如果有商品行数据
             if (data.productItems) {
@@ -2131,6 +2173,9 @@
                 
                 console.log('保存订单响应:', response);
                 showToast(`订单${docTypeText === '预算' ? '（预算）' : '（结算）'}保存成功！`, 'success');
+                
+                // 保存成功后清除未保存标记
+                hasUnsavedChanges = false;
                 
             } catch (error) {
                 console.error('保存订单失败:', error);
@@ -2392,6 +2437,9 @@
                 }
                 
                 showToast('新订单创建成功！', 'success');
+                
+                // 创建新订单后清除未保存标记
+                hasUnsavedChanges = false;
             } catch (error) {
                 console.error('创建新订单失败:', error);
                 showToast('创建新订单失败，请重试', 'error');
@@ -2565,6 +2613,13 @@
                     const arrow = document.querySelector('.dropdown-arrow');
                     if (dropdown) dropdown.style.display = 'none';
                     if (arrow) arrow.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // 监听输入变化，设置未保存标记
+            document.addEventListener('input', function(event) {
+                if (event.target.tagName === 'INPUT' && event.target.id) {
+                    hasUnsavedChanges = true;
                 }
             });
             
