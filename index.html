@@ -1301,34 +1301,556 @@
             color: #2c3e50;
         }
         
-        /* ==================== 响应式设计 ==================== */
+        /* ==================== 响应式设计（移动端优化） ==================== */
         @media screen and (max-width: 768px) {
+            /* 基础调整 */
+            body {
+                margin: 5px;
+                font-size: 14px;
+                padding-bottom: 80px;
+            }
+
+            /* 顶部导航栏优化 */
             .header-bar {
                 flex-direction: column;
-                gap: 15px;
-                padding: 15px;
+                gap: 10px;
+                padding: 12px 15px;
+                border-radius: 10px;
+                margin-bottom: 10px;
             }
-            
-            .action-buttons {
-                flex-direction: column;
+
+            .logo-section {
+                gap: 10px;
             }
-            
-            .btn {
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+
+            .logo-text h1 {
+                font-size: 18px;
+            }
+
+            .logo-text span {
+                font-size: 11px;
+            }
+
+            /* 用户信息优化 */
+            .user-section {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .user-info {
                 width: 100%;
                 justify-content: center;
+                flex-wrap: wrap;
             }
-            
+
+            .user-details {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .btn-history, .btn-logout {
+                padding: 8px 15px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
+
+            /* 操作按钮优化 - 底部固定工具栏 */
+            .action-buttons {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                padding: 10px 15px 20px;
+                background: rgba(255,255,255,0.98);
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+                z-index: 9999;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: calc(50% - 4px);
+                padding: 12px 15px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+
+            .btn-exit {
+                order: 1;
+            }
+
+            .btn-save {
+                order: 2;
+            }
+
+            .btn-new {
+                order: 3;
+            }
+
+            .btn-print, .btn-export {
+                order: 4;
+                min-width: calc(50% - 4px);
+            }
+
+            .btn-image {
+                order: 5;
+                min-width: calc(50% - 4px);
+            }
+
+            /* 表单容器优化 */
+            .form-container {
+                padding: 10px;
+                margin-bottom: 150px;
+                border-radius: 10px;
+            }
+
+            /* 头部优化 */
+            .header {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px;
+                margin-bottom: 8px;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .document-type-display {
+                font-size: 18px;
+            }
+
+            .order-number {
+                width: 100%;
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            .order-number input {
+                font-size: 14px;
+                width: 100%;
+            }
+
+            /* 通知区域优化 */
+            .notice {
+                padding: 8px;
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+
+            .notice strong {
+                font-size: 14px;
+            }
+
+            /* 信息表格优化 */
+            .info-table td {
+                height: auto;
+                padding: 6px 4px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .info-table td:first-child {
+                width: 30%;
+                font-size: 12px;
+                padding: 6px 4px;
+            }
+
+            /* 商品表格优化 - 横向滚动 */
+            .product-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                font-size: 11px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .product-table thead, .product-table tbody, .product-table tfoot {
+                display: table;
+                width: 100%;
+                min-width: 700px;
+            }
+
+            .product-table th {
+                padding: 8px 4px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .product-table td {
+                height: auto;
+                padding: 6px 4px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .product-table input {
+                font-size: 12px;
+                padding: 4px 2px;
+            }
+
+            /* 送货方式和金额区域优化 */
+            .delivery-container {
+                font-size: 12px;
+            }
+
+            .amount-container {
+                font-size: 12px;
+            }
+
+            .payment-table td {
+                height: auto;
+                padding: 6px 4px;
+                font-size: 12px;
+            }
+
+            /* 条款和签章区域优化 */
+            .terms, .agreement {
+                font-size: 11px;
+                padding: 6px 8px;
+                margin-top: 6px;
+            }
+
+            .signature-section {
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .signature-box {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .signature-line, .signature-stamp {
+                height: 25px;
+            }
+
+            /* 历史记录抽屉优化 */
             .history-drawer {
                 width: 100%;
                 right: -100%;
+                z-index: 10001;
             }
-            
+
+            .drawer-header {
+                padding: 15px 20px;
+            }
+
+            .drawer-header h3 {
+                font-size: 18px;
+            }
+
+            .drawer-content {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+
+            /* 历史记录控制栏优化 */
+            .history-controls {
+                margin-bottom: 10px;
+            }
+
+            .history-tabs {
+                gap: 6px;
+            }
+
+            .history-tab {
+                padding: 8px 10px;
+                font-size: 13px;
+                border-radius: 6px;
+            }
+
+            .history-search input {
+                padding: 10px 12px 10px 35px;
+                font-size: 13px;
+            }
+
+            /* 历史记录卡片优化 */
+            .history-grid {
+                gap: 6px;
+            }
+
+            .history-item {
+                padding: 8px 10px;
+                border-radius: 6px;
+            }
+
+            .history-item-title {
+                font-size: 13px;
+            }
+
+            .history-item-date {
+                font-size: 10px;
+            }
+
+            .history-detail-row {
+                font-size: 11px;
+            }
+
+            .history-detail-label {
+                min-width: 50px;
+                font-size: 10px;
+            }
+
+            .history-item-amount {
+                font-size: 16px;
+                margin: 4px 0;
+            }
+
+            .btn-history-action {
+                padding: 8px 10px;
+                font-size: 12px;
+                border-radius: 5px;
+            }
+
+            /* 模态框优化 */
+            .modal-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                padding: 20px;
+                border-radius: 15px 15px 0 0;
+                animation: modalSlideUp 0.3s ease;
+            }
+
+            @keyframes modalSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .modal-header h2 {
+                font-size: 22px;
+            }
+
+            .modal-header p {
+                font-size: 13px;
+            }
+
+            .modal-tab {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .btn-submit {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            /* 未登录遮罩优化 */
+            .login-required-content {
+                padding: 20px;
+            }
+
+            .login-required-icon {
+                font-size: 60px;
+            }
+
+            .login-required-content h3 {
+                font-size: 20px;
+            }
+
+            .login-required-content p {
+                font-size: 13px;
+            }
+
+            .btn-login-prompt {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+
+            /* Toast提示优化 */
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+
+            .toast {
+                min-width: auto;
+                padding: 12px 16px;
+            }
+
+            .toast-message {
+                font-size: 13px;
+            }
+
+            /* 版本标签优化 */
+            .version-badge {
+                top: 5px;
+                right: 5px;
+                padding: 4px 10px;
+                font-size: 10px;
+            }
+
+            /* 输入框触摸优化 */
+            input, select, textarea {
+                min-height: 36px;
+            }
+
+            /* 打印样式优化 */
+            @media print {
+                .action-buttons {
+                    display: none !important;
+                }
+
+                body {
+                    font-size: 8px;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .form-container {
+                    padding: 5px;
+                    margin: 0;
+                    box-shadow: none;
+                    border-radius: 0;
+                }
+
+                .header {
+                    padding: 5px;
+                    margin-bottom: 3px;
+                }
+
+                .header h1 {
+                    font-size: 16px;
+                }
+
+                .product-table th,
+                .product-table td {
+                    font-size: 8px;
+                    padding: 2px;
+                }
+
+                .info-table td {
+                    font-size: 9px;
+                    height: 18px;
+                    padding: 2px 3px;
+                }
+            }
+        }
+
+        /* ==================== 超小屏幕优化（< 480px） ==================== */
+        @media screen and (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .logo-text h1 {
+                font-size: 16px;
+            }
+
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+
+            .btn {
+                padding: 10px 12px;
+                font-size: 13px;
+                min-width: calc(50% - 4px);
+            }
+
+            .action-buttons {
+                padding: 8px 10px 25px;
+            }
+
             .form-container {
+                padding: 8px;
+            }
+
+            .product-table input {
+                font-size: 11px;
+            }
+
+            .history-item-title {
+                font-size: 12px;
+            }
+
+            .history-item-amount {
+                font-size: 14px;
+            }
+        }
+
+        /* ==================== 平板优化（768px - 1024px） ==================== */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .form-container {
+                max-width: 95%;
+                padding: 20px;
+            }
+
+            .header-bar {
+                padding: 12px 20px;
+            }
+
+            .action-buttons {
+                gap: 10px;
                 padding: 15px;
             }
-            
-            .modal-content {
-                padding: 25px;
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .product-table th {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+
+            .product-table td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+
+            .history-drawer {
+                width: 380px;
             }
         }
         
