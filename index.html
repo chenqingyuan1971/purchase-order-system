@@ -1464,38 +1464,153 @@
                 font-size: 14px;
             }
 
+            /* ==================== 移动端表格容器（解决溢出问题） ==================== */
+            .table-scroll-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -5px;
+                padding: 0 5px;
+            }
+
+            .table-scroll-wrapper::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            .table-scroll-wrapper::-webkit-scrollbar-thumb {
+                background: #c0c0c0;
+                border-radius: 2px;
+            }
+
+            .table-scroll-wrapper::-webkit-scrollbar-track {
+                background: #f0f0f0;
+                border-radius: 2px;
+            }
+
             /* 信息表格优化 */
+            .info-table {
+                width: 100%;
+                min-width: 100%;
+                table-layout: fixed;
+            }
+
             .info-table td {
                 height: auto;
-                padding: 6px 4px;
+                padding: 8px 6px;
                 font-size: 12px;
-                white-space: nowrap;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.4;
+                vertical-align: middle;
             }
 
             .info-table td:first-child {
-                width: 30%;
-                font-size: 12px;
-                padding: 6px 4px;
-            }
-
-            /* 商品表格优化 - 横向滚动 */
-            .product-table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
+                width: 28%;
                 font-size: 11px;
-                -webkit-overflow-scrolling: touch;
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-            .product-table thead, .product-table tbody, .product-table tfoot {
-                display: table;
+            /* 修复送货方式单元格 */
+            .info-table td[rowspan="2"] {
+                position: relative;
+                padding: 0;
+            }
+
+            .delivery-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                font-size: 12px;
+                height: 100%;
+            }
+
+            .delivery-label {
+                width: 45px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-right: 1px solid #333;
+                background-color: #f8f9fa;
+                font-size: 11px;
+                padding: 4px;
+                text-align: center;
+            }
+
+            .delivery-input {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                padding: 0 6px;
+                overflow: hidden;
+            }
+
+            .delivery-input input {
                 width: 100%;
-                min-width: 700px;
+                font-size: 12px;
+                border: none;
+                outline: none;
+                background: transparent;
+            }
+
+            /* 信息表格输入框优化 */
+            .info-table input {
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                font-size: 12px;
+                padding: 4px 2px;
+                border: none;
+                outline: none;
+                background: transparent;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .info-table input:focus {
+                background: #f0f8ff;
+                border-bottom: 1px solid #3498db;
+            }
+
+            /* ==================== 商品表格优化 - 横向滚动 ==================== */
+            .product-table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -5px;
+                padding: 0 5px;
+            }
+
+            .product-table-wrapper::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            .product-table-wrapper::-webkit-scrollbar-thumb {
+                background: #c0c0c0;
+                border-radius: 2px;
+            }
+
+            .product-table-wrapper::-webkit-scrollbar-track {
+                background: #f0f0f0;
+                border-radius: 2px;
+            }
+
+            .product-table {
+                width: 100%;
+                min-width: 680px;
+                font-size: 11px;
             }
 
             .product-table th {
                 padding: 8px 4px;
-                font-size: 11px;
+                font-size: 10px;
                 white-space: nowrap;
             }
 
@@ -1507,8 +1622,85 @@
             }
 
             .product-table input {
+                width: 100%;
+                min-width: 0;
                 font-size: 12px;
                 padding: 4px 2px;
+                border: none;
+                outline: none;
+                background: transparent;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .product-table input:focus {
+                background: #f0f8ff;
+            }
+
+            /* 商品表格表头固定 */
+            .product-table thead th {
+                background: #d6d8db;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            /* ==================== 付款表格优化 ==================== */
+            .payment-table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .payment-table {
+                width: 100%;
+                min-width: 100%;
+                table-layout: fixed;
+            }
+
+            .payment-table td {
+                height: auto;
+                padding: 8px 6px;
+                font-size: 12px;
+                white-space: normal;
+                word-break: break-all;
+            }
+
+            .payment-table td:first-child {
+                width: 30%;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .payment-table input {
+                width: 100%;
+                font-size: 12px;
+                padding: 4px 2px;
+                border: none;
+                outline: none;
+                background: transparent;
+            }
+
+            .payment-table input:focus {
+                background: #f0f8ff;
+            }
+
+            /* ==================== 签章区域优化 ==================== */
+            .signature-section {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .signature-box {
+                width: 100%;
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            .signature-line, .signature-stamp {
+                height: 30px;
             }
 
             /* 送货方式和金额区域优化 */
@@ -1990,6 +2182,7 @@
             <strong>温馨提示：</strong>为了购货方的合法权益特制订此政策，请详细阅读本单据购物须知，并确认单据内各项购物内容。一经签字确认，将视同购货方对本单据所有内容均表示同意。
         </div>
         
+        <div class="table-scroll-wrapper">
         <table class="info-table">
             <tr>
                 <td style="width: 15%;">购货方</td>
@@ -2026,7 +2219,9 @@
                 <td><input type="date" class="input-field" id="deliveryDate"></td>
             </tr>
         </table>
+        </div>
         
+        <div class="product-table-wrapper">
         <table class="product-table">
             <thead>
                 <tr>
@@ -2055,6 +2250,7 @@
                 </tr>
             </tfoot>
         </table>
+        </div>
         
         <table>
             <tr>
