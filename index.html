@@ -1604,7 +1604,7 @@
             /* ==================== 付款表格优化 ==================== */
             .payment-table {
                 width: 100%;
-                min-width: 600px;
+                min-width: 650px;
                 border-collapse: collapse;
             }
 
@@ -1618,14 +1618,17 @@
             }
 
             .payment-table td:first-child {
-                width: 60px;
-                min-width: 60px;
-                max-width: 60px;
-                font-size: 11px;
+                width: 90px;
+                min-width: 90px;
+                max-width: 90px;
+                font-size: 12px;
                 font-weight: bold;
                 text-align: center;
                 background-color: #f8f9fa;
                 white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 6px 4px;
             }
 
             .payment-table td:not(:first-child) {
@@ -1636,35 +1639,41 @@
             .account-info {
                 display: flex;
                 flex-wrap: nowrap;
-                gap: 12px;
+                gap: 0;
                 align-items: center;
                 width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
-                padding: 4px 0;
-            }
-
-            .account-item {
-                display: flex;
-                align-items: center;
-                white-space: nowrap;
-                flex-shrink: 0;
             }
 
             .account-label {
                 font-size: 12px;
                 color: #000;
                 font-weight: bold;
-            }
-
-            .account-value {
-                font-size: 12px;
-                color: #000;
+                white-space: nowrap;
+                padding: 0 2px;
             }
 
             .account-separator {
                 color: #999;
-                flex-shrink: 0;
+                padding: 0 6px;
+                white-space: nowrap;
+            }
+
+            .account-input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 12px;
+                color: #000;
+                padding: 2px 4px;
+                min-width: 60px;
+                max-width: 120px;
+                white-space: nowrap;
+            }
+
+            .account-input:focus {
+                background: #f0f8ff;
             }
 
             /* 移动端下划线输入框 */
@@ -1929,34 +1938,53 @@
             .account-info {
                 display: flex;
                 flex-wrap: nowrap;
-                gap: 20px;
+                gap: 0;
                 align-items: center;
                 width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
-                padding: 4px 0;
-            }
-
-            .account-item {
-                display: flex;
-                align-items: center;
-                white-space: nowrap;
             }
 
             .account-label {
                 font-size: 12px;
                 color: #000;
                 font-weight: bold;
-            }
-
-            .account-value {
-                font-size: 12px;
-                color: #000;
+                white-space: nowrap;
+                padding: 0 2px;
             }
 
             .account-separator {
                 color: #999;
-                margin: 0 2px;
+                padding: 0 8px;
+                white-space: nowrap;
+            }
+
+            .account-input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 12px;
+                color: #000;
+                padding: 2px 4px;
+                min-width: 80px;
+                max-width: 150px;
+                white-space: nowrap;
+            }
+
+            .account-input:focus {
+                background: #f0f8ff;
+            }
+
+            #accountNumber {
+                width: 160px;
+            }
+
+            #accountName {
+                width: 80px;
+            }
+
+            #bankName {
+                width: 120px;
             }
 
             /* ==================== 下划线输入框样式 ==================== */
@@ -2647,20 +2675,14 @@
                     <td>收款账户</td>
                     <td>
                         <div class="account-info">
-                            <div class="account-item">
-                                <span class="account-label">账号：</span>
-                                <span class="account-value">6226 1529 0065 3167</span>
-                            </div>
+                            <span class="account-label">账号：</span>
+                            <input type="text" class="account-input" value="6226 1529 0065 3167" id="accountNumber">
                             <span class="account-separator">|</span>
-                            <div class="account-item">
-                                <span class="account-label">户名：</span>
-                                <span class="account-value">饶玉珍</span>
-                            </div>
+                            <span class="account-label">户名：</span>
+                            <input type="text" class="account-input" value="饶玉珍" id="accountName">
                             <span class="account-separator">|</span>
-                            <div class="account-item">
-                                <span class="account-label">开户行：</span>
-                                <span class="account-value">中国民生银行</span>
-                            </div>
+                            <span class="account-label">开户行：</span>
+                            <input type="text" class="account-input" value="中国民生银行" id="bankName">
                         </div>
                     </td>
                 </tr>
