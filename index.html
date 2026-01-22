@@ -1505,7 +1505,7 @@
             }
 
             .info-table td:first-child {
-                width: 28%;
+                width: 25%;
                 font-size: 11px;
                 padding: 8px 4px;
                 white-space: nowrap;
@@ -1520,14 +1520,15 @@
             }
 
             .delivery-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
                 display: flex;
                 font-size: 12px;
                 height: 100%;
+                min-height: 100%;
             }
 
             .delivery-label {
@@ -1538,7 +1539,7 @@
                 justify-content: center;
                 border-right: 1px solid #333;
                 background-color: #f8f9fa;
-                font-size: 11px;
+                font-size: 10px;
                 padding: 4px;
                 text-align: center;
             }
@@ -1559,7 +1560,7 @@
                 background: transparent;
             }
 
-            /* 信息表格输入框优化 */
+            /* 信息表格输入框优化 - 允许长文本换行 */
             .info-table input {
                 width: 100%;
                 min-width: 0;
@@ -1569,14 +1570,28 @@
                 border: none;
                 outline: none;
                 background: transparent;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                white-space: normal;
+                word-break: break-all;
+                overflow: visible;
             }
 
             .info-table input:focus {
                 background: #f0f8ff;
                 border-bottom: 1px solid #3498db;
+            }
+
+            /* 长文本字段优化 - 公司名称、地址等 */
+            #supplier,
+            #supplierAddress,
+            #receiverAddress {
+                white-space: normal;
+                word-break: break-all;
+            }
+
+            /* colspan 单元格优化 */
+            .info-table td[colspan="2"] {
+                white-space: normal;
+                word-break: break-all;
             }
 
             /* ==================== 商品表格优化 - 横向滚动 ==================== */
@@ -1684,6 +1699,101 @@
 
             .payment-table input:focus {
                 background: #f0f8ff;
+            }
+
+            /* ==================== 收款账户信息优化 ==================== */
+            .account-info {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                align-items: center;
+                width: 100%;
+            }
+
+            .account-label {
+                font-size: 11px;
+                color: #666;
+                white-space: nowrap;
+            }
+
+            .account-info input {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            #accountNumber {
+                width: 100%;
+                max-width: 180px;
+            }
+
+            #accountName {
+                width: 100%;
+                max-width: 80px;
+            }
+
+            #bankName {
+                width: 100%;
+                max-width: 120px;
+            }
+
+            /* ==================== 备注字段优化 ==================== */
+            .remarks-input {
+                width: 100%;
+                font-size: 12px;
+                line-height: 1.5;
+                padding: 6px 8px;
+                border: none;
+                outline: none;
+                background: transparent;
+                resize: none;
+                min-height: 50px;
+                height: auto;
+            }
+
+            .remarks-input:focus {
+                background: #f0f8ff;
+            }
+
+            /* ==================== 金额区域优化 ==================== */
+            .amount-container {
+                display: flex;
+                height: auto;
+                min-height: 36px;
+            }
+
+            .amount-chinese {
+                flex: 1;
+                padding: 6px 8px;
+                border-right: 1px solid #333;
+                display: flex;
+                align-items: center;
+                min-width: 0;
+            }
+
+            .amount-number {
+                flex: 1;
+                padding: 6px 8px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                min-width: 0;
+            }
+
+            .amount-chinese input,
+            .amount-number input {
+                flex: 1;
+                min-width: 0;
+                font-size: 12px;
+            }
+
+            /* ==================== 条款区域优化 ==================== */
+            .terms, .agreement {
+                font-size: 11px;
+                padding: 8px 10px;
+                margin-top: 8px;
+                line-height: 1.6;
+                white-space: normal;
+                word-break: break-word;
             }
 
             /* ==================== 签章区域优化 ==================== */
@@ -2252,13 +2362,16 @@
         </table>
         </div>
         
+        <div class="table-scroll-wrapper">
         <table>
             <tr>
                 <td style="width: 15%; text-align: center; font-weight: bold; background-color: #f8f9fa;">备注</td>
                 <td style="height: 50px;"><input type="text" class="input-field" value="质保期五年，从安装结束之日起算；质保期内非人为和自然灾害原因引起的质量问题、安装问题，由供货方负责维保" id="remarks"></td>
             </tr>
         </table>
+        </div>
         
+        <div class="table-scroll-wrapper">
         <div class="payment-section">
             <table class="payment-table">
                 <tr>
@@ -2267,7 +2380,7 @@
                 </tr>
                 <tr>
                     <td>收款账户</td>
-                    <td>账号：<input type="text" class="input-field" style="width: 20%; display: inline-block;" value="6226 1529 0065 3167"> 户名：<input type="text" class="input-field" style="width: 15%; display: inline-block;" value="饶玉珍"> 开户行：<input type="text" class="input-field" style="width: 50%; display: inline-block;" value="中国民生银行"></td>
+                    <td><input type="text" class="input-field" value="6226 1529 0065 3167" id="accountNumber"> <span class="account-info"><span class="account-label">户名：</span><input type="text" class="input-field" value="饶玉珍" id="accountName"> <span class="account-label">开户行：</span><input type="text" class="input-field" value="中国民生银行" id="bankName"></span></td>
                 </tr>
                 <tr>
                     <td>实售金额</td>
@@ -2309,6 +2422,7 @@
                     </td>
                 </tr>
             </table>
+        </div>
         </div>
         
         <div class="terms">
