@@ -1632,33 +1632,61 @@
                 padding: 6px 8px;
             }
 
-            /* 收款账户信息 - 垂直排列 */
+            /* 收款账户信息 - 横向排列 */
             .account-info {
                 display: flex;
-                flex-direction: column;
-                gap: 4px;
+                flex-wrap: nowrap;
+                gap: 12px;
+                align-items: center;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 4px 0;
             }
 
-            .account-row {
+            .account-item {
                 display: flex;
                 align-items: center;
-                gap: 4px;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .account-label {
-                font-size: 11px;
-                color: #666;
-                white-space: nowrap;
+                font-size: 12px;
+                color: #000;
+                font-weight: bold;
             }
 
-            .account-row input {
-                flex: 1;
+            .account-value {
                 font-size: 12px;
-                padding: 2px 4px;
+                color: #000;
+            }
+
+            .account-separator {
+                color: #999;
+                flex-shrink: 0;
+            }
+
+            /* 移动端下划线输入框 */
+            .terms .underline-input {
                 border: none;
+                border-bottom: 1px solid #000;
                 outline: none;
                 background: transparent;
-                border-bottom: 1px solid #ddd;
+                font-size: 12px;
+                padding: 2px 2px;
+                text-align: center;
+                min-width: 60px;
+                color: #000;
+            }
+
+            .terms .underline-input::placeholder {
+                color: #999;
+                opacity: 1;
+            }
+
+            .terms .underline-input:focus {
+                border-bottom-color: #3498db;
             }
 
             /* 金额区域 */
@@ -1897,39 +1925,67 @@
                 background: #f0f8ff;
             }
 
-            /* ==================== 收款账户信息优化 ==================== */
+            /* ==================== 收款账户信息优化 - 横向排列 ==================== */
             .account-info {
                 display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
+                flex-wrap: nowrap;
+                gap: 20px;
                 align-items: center;
                 width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 4px 0;
             }
 
-            .account-label {
-                font-size: 11px;
-                color: #666;
+            .account-item {
+                display: flex;
+                align-items: center;
                 white-space: nowrap;
             }
 
-            .account-info input {
-                flex: 1;
+            .account-label {
+                font-size: 12px;
+                color: #000;
+                font-weight: bold;
+            }
+
+            .account-value {
+                font-size: 12px;
+                color: #000;
+            }
+
+            .account-separator {
+                color: #999;
+                margin: 0 2px;
+            }
+
+            /* ==================== 下划线输入框样式 ==================== */
+            .underline-field {
+                display: inline-block;
                 min-width: 100px;
+                max-width: 200px;
             }
 
-            #accountNumber {
+            .terms .underline-input {
+                border: none;
+                border-bottom: 1px solid #000;
+                outline: none;
+                background: transparent;
+                font-size: 12px;
                 width: 100%;
-                max-width: 180px;
+                padding: 2px 4px;
+                text-align: center;
+                min-width: 80px;
+                color: #000;
             }
 
-            #accountName {
-                width: 100%;
-                max-width: 80px;
+            .terms .underline-input::placeholder {
+                color: #999;
+                opacity: 1;
             }
 
-            #bankName {
-                width: 100%;
-                max-width: 120px;
+            .terms .underline-input:focus {
+                border-bottom-color: #3498db;
             }
 
             /* ==================== 备注字段优化 ==================== */
@@ -2591,16 +2647,19 @@
                     <td>收款账户</td>
                     <td>
                         <div class="account-info">
-                            <div class="account-row">
-                                <input type="text" class="input-field" value="6226 1529 0065 3167" id="accountNumber">
+                            <div class="account-item">
+                                <span class="account-label">账号：</span>
+                                <span class="account-value">6226 1529 0065 3167</span>
                             </div>
-                            <div class="account-row">
+                            <span class="account-separator">|</span>
+                            <div class="account-item">
                                 <span class="account-label">户名：</span>
-                                <span class="account-value"><input type="text" class="input-field" value="饶玉珍" id="accountName"></span>
+                                <span class="account-value">饶玉珍</span>
                             </div>
-                            <div class="account-row">
+                            <span class="account-separator">|</span>
+                            <div class="account-item">
                                 <span class="account-label">开户行：</span>
-                                <span class="account-value"><input type="text" class="input-field" value="中国民生银行" id="bankName"></span>
+                                <span class="account-value">中国民生银行</span>
                             </div>
                         </div>
                     </td>
@@ -2649,7 +2708,7 @@
         
         <div class="terms">
             <strong>其他约定：</strong><br>
-            1. 货款余额应由购货方在<input type="text" class="input-field" id="balanceDueDate" placeholder="请选择或填写付款条件" list="balanceDueDateOptions">付清。<br>
+            1. 货款余额应由购货方在<span class="underline-field" id="balanceDueDateContainer"><input type="text" class="underline-input" id="balanceDueDate" placeholder="请选择或填写付款条件" list="balanceDueDateOptions"></span>付清。<br>
             2. 本单实售合计金额中已包含上门检测、测量、设计、出图等相关费用。
         </div>
 
