@@ -1750,41 +1750,68 @@
         // ==================== API工具函数 ====================
         const Api = {
             // 发送请求到后端
-            async request(endpoint, options = {}) {
+            // 通用请求方法（带自动重试机制，应对后端冷启动）
+            async request(endpoint, options = {}, maxRetries = 3, initialDelay = 2000) {
                 const url = `${API_BASE_URL}${endpoint}`;
-                
+
                 // 获取存储的token
                 const token = localStorage.getItem('authToken');
-                
+
                 const headers = {
                     'Content-Type': 'application/json',
                     ...options.headers
                 };
-                
+
                 // 如果有token，添加到请求头
                 if (token) {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
-                
-                try {
-                    const response = await fetch(url, {
-                        ...options,
-                        headers
-                    });
-                    
-                    // 解析响应
-                    const data = await response.json();
-                    
-                    // 检查HTTP状态
-                    if (!response.ok) {
-                        throw new Error(data.message || `请求失败 (${response.status})`);
+
+                let lastError;
+
+                for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                    try {
+                        const response = await fetch(url, {
+                            ...options,
+                            headers
+                        });
+
+                        // 解析响应
+                        const data = await response.json();
+
+                        // 检查HTTP状态
+                        if (!response.ok) {
+                            throw new Error(data.message || `请求失败 (${response.status})`);
+                        }
+
+                        return data;
+                    } catch (error) {
+                        lastError = error;
+                        console.warn(`API请求失败 (尝试 ${attempt}/${maxRetries}):`, error.message);
+
+                        // 检查是否为可重试的错误（404、500、502、503 网络错误或服务器错误）
+                        const isRetryable = error.message.includes('404') ||
+                                          error.message.includes('Failed to fetch') ||
+                                          error.message.includes('NetworkError') ||
+                                          error.message.includes('net::ERR') ||
+                                          error.message.includes('500') ||
+                                          error.message.includes('502') ||
+                                          error.message.includes('503');
+
+                        if (isRetryable && attempt < maxRetries) {
+                            // 指数退避：延迟时间随重试次数增加
+                            const delay = initialDelay * Math.pow(2, attempt - 1);
+                            console.log(`将在 ${delay/1000}秒后进行第 ${attempt + 1}次重试...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        } else {
+                            // 不可重试的错误或已达到最大重试次数，直接抛出错误
+                            break;
+                        }
                     }
-                    
-                    return data;
-                } catch (error) {
-                    console.error('API请求错误:', error);
-                    throw error;
                 }
+
+                console.error('API请求最终失败:', lastError);
+                throw lastError;
             },
             
             // 用户注册
