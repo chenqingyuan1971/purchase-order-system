@@ -3012,7 +3012,9 @@
                 if (inputs[3]) inputs[3].value = '799';
             }
             
-            // 加载保存的数据（本地存储）
+            // 注释：不再自动加载本地保存的数据，每次刷新都显示新文件
+            // 如果需要恢复此功能，取消注释以下代码即可
+            /*
             try {
                 const savedData = localStorage.getItem('purchaseOrderData');
                 if (savedData) {
@@ -3028,6 +3030,7 @@
             } catch (error) {
                 console.error('加载数据失败:', error);
             }
+            */
             
             // 点击其他地方关闭下拉菜单
             document.addEventListener('click', function(event) {
