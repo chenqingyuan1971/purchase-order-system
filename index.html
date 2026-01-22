@@ -1464,7 +1464,7 @@
                 font-size: 14px;
             }
 
-            /* ==================== 移动端表格基础样式（重新设计） ==================== */
+            /* ==================== 移动端表格优化 - 横向滚动方案 ==================== */
             .table-scroll-wrapper {
                 width: 100%;
                 overflow-x: auto;
@@ -1488,85 +1488,58 @@
             /* ==================== 信息表格移动端优化 ==================== */
             .info-table {
                 width: 100%;
+                min-width: 600px;
                 border-collapse: collapse;
             }
 
-            .info-table tr {
-                display: flex;
-                flex-wrap: wrap;
-            }
-
             .info-table td {
-                display: block;
-                box-sizing: border-box;
+                padding: 6px 8px;
+                font-size: 12px;
+                border: 1px solid #333;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.4;
+                vertical-align: middle;
             }
 
-            /* 第一列（标签）固定宽度 */
             .info-table td:first-child {
-                flex: 0 0 70px;
-                width: 70px;
-                min-width: 70px;
-                max-width: 70px;
-                font-size: 12px;
+                width: 60px;
+                min-width: 60px;
+                max-width: 60px;
+                font-size: 11px;
                 font-weight: bold;
-                padding: 8px 4px;
-                background-color: #f8f9fa;
                 text-align: center;
-                border: 1px solid #333;
-                border-right: none;
+                background-color: #f8f9fa;
+                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
-            /* 清除第一列的右边框 */
-            .info-table tr td:first-child {
-                border-right: none;
+            .info-table td[colspan="2"] {
+                width: 180px;
+                min-width: 180px;
             }
 
-            /* 第二列及之后的内容 */
-            .info-table td:not(:first-child) {
-                flex: 1;
-                min-width: 100px;
-                font-size: 12px;
-                padding: 8px 6px;
-                border: 1px solid #333;
-                white-space: normal;
-                word-break: break-all;
-            }
-
-            /* 处理colspan */
-            .info-table td[colspan="2"]:not(:first-child) {
-                flex: 1;
-                min-width: 200px;
-            }
-
-            /* 处理rowspan - 送货方式 */
             .info-table td[rowspan="2"] {
-                flex: 0 0 100%;
-                width: 100%;
-                min-width: 100%;
+                width: 100px;
+                min-width: 100px;
                 padding: 0;
-                border: 1px solid #333;
-                border-top: none;
-                position: relative;
-                display: flex;
-                flex-direction: column;
             }
 
-            .delivery-container {
+            /* 送货方式单元格 */
+            .info-table td[rowspan="2"] .delivery-container {
                 display: flex;
-                width: 100%;
+                height: 100%;
                 min-height: 36px;
             }
 
-            .delivery-label {
-                flex: 0 0 70px;
-                width: 70px;
-                min-width: 70px;
-                max-width: 70px;
-                font-size: 12px;
+            .info-table td[rowspan="2"] .delivery-label {
+                width: 60px;
+                min-width: 60px;
+                max-width: 60px;
+                font-size: 11px;
                 font-weight: bold;
-                padding: 8px 4px;
+                padding: 6px 4px;
                 background-color: #f8f9fa;
                 text-align: center;
                 border-right: 1px solid #333;
@@ -1575,33 +1548,26 @@
                 justify-content: center;
             }
 
-            .delivery-input {
+            .info-table td[rowspan="2"] .delivery-input {
                 flex: 1;
-                padding: 8px 6px;
+                padding: 6px 8px;
                 display: flex;
                 align-items: center;
             }
 
-            .delivery-input input {
+            .info-table td[rowspan="2"] .delivery-input input {
                 width: 100%;
                 font-size: 12px;
-                padding: 4px 2px;
                 border: none;
                 outline: none;
                 background: transparent;
-            }
-
-            /* 清除边框问题 */
-            .info-table td[rowspan="2"] + td,
-            .info-table td[rowspan="2"] ~ td {
-                display: none;
             }
 
             /* 输入框样式 */
             .info-table input {
                 width: 100%;
                 font-size: 12px;
-                padding: 4px 2px;
+                padding: 2px 4px;
                 border: none;
                 outline: none;
                 background: transparent;
@@ -1613,131 +1579,106 @@
                 background: #f0f8ff;
             }
 
-            /* ==================== 备注字段优化 ==================== */
+            /* ==================== 备注表格优化 ==================== */
             .info-table td[style*="text-align: center"] {
-                flex: 0 0 70px;
-                width: 70px;
-                min-width: 70px;
-                max-width: 70px;
-                font-size: 12px;
+                width: 60px;
+                min-width: 60px;
+                max-width: 60px;
+                font-size: 11px;
                 font-weight: bold;
-                padding: 8px 4px;
-                background-color: #f8f9fa;
                 text-align: center;
-                border: 1px solid #333;
-                border-right: none;
+                background-color: #f8f9fa;
             }
 
             .info-table td[style*="height: 50px"] {
-                flex: 1;
-                min-width: 200px;
                 height: auto !important;
-                padding: 8px 6px;
-                border: 1px solid #333;
-                white-space: normal;
+                min-height: 50px;
+                padding: 6px 8px;
             }
 
             .info-table td[style*="height: 50px"] input {
-                width: 100%;
-                font-size: 12px;
-                line-height: 1.5;
+                min-height: 40px;
                 resize: none;
-                min-height: 50px;
             }
 
-            /* ==================== 付款区域优化 - 重新设计表格布局 ==================== */
+            /* ==================== 付款表格优化 ==================== */
             .payment-table {
                 width: 100%;
+                min-width: 600px;
                 border-collapse: collapse;
             }
 
-            .payment-table tr {
-                display: flex;
-                flex-wrap: wrap;
-            }
-
             .payment-table td {
-                display: block;
-                box-sizing: border-box;
+                padding: 6px 8px;
+                font-size: 12px;
+                border: 1px solid #333;
+                white-space: normal;
+                word-break: break-all;
+                vertical-align: middle;
             }
 
             .payment-table td:first-child {
-                flex: 0 0 70px;
-                width: 70px;
-                min-width: 70px;
-                max-width: 70px;
-                font-size: 12px;
+                width: 60px;
+                min-width: 60px;
+                max-width: 60px;
+                font-size: 11px;
                 font-weight: bold;
-                padding: 8px 4px;
-                background-color: #f8f9fa;
                 text-align: center;
-                border: 1px solid #333;
-                border-right: none;
+                background-color: #f8f9fa;
+                white-space: nowrap;
             }
 
             .payment-table td:not(:first-child) {
-                flex: 1;
-                min-width: 200px;
-                font-size: 12px;
-                padding: 8px 6px;
-                border: 1px solid #333;
+                padding: 6px 8px;
             }
 
-            /* 收款账户行特殊处理 */
-            .payment-table tr:nth-child(2) td:first-child {
-                align-self: flex-start;
-            }
-
+            /* 收款账户信息 - 垂直排列 */
             .account-info {
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
-                width: 100%;
+                gap: 4px;
             }
 
             .account-row {
                 display: flex;
                 align-items: center;
-                gap: 6px;
-            }
-
-            .account-row input {
-                flex: 1;
-                min-width: 0;
-                font-size: 12px;
-                padding: 4px 2px;
-                border: none;
-                outline: none;
-                background: transparent;
-                border-bottom: 1px solid #ddd;
+                gap: 4px;
             }
 
             .account-label {
                 font-size: 11px;
                 color: #666;
                 white-space: nowrap;
-                flex-shrink: 0;
+            }
+
+            .account-row input {
+                flex: 1;
+                font-size: 12px;
+                padding: 2px 4px;
+                border: none;
+                outline: none;
+                background: transparent;
+                border-bottom: 1px solid #ddd;
             }
 
             /* 金额区域 */
             .amount-container {
                 display: flex;
-                width: 100%;
-                min-height: 36px;
+                height: 28px;
             }
 
             .amount-chinese {
                 flex: 1;
                 display: flex;
                 align-items: center;
-                padding: 6px 8px;
+                padding: 0 8px;
                 border-right: 1px solid #333;
                 min-width: 0;
             }
 
             .amount-chinese input {
                 width: 100%;
-                font-size: 12px;
+                font-size: 11px;
                 border: none;
                 outline: none;
                 background: transparent;
@@ -1747,19 +1688,42 @@
                 flex: 1;
                 display: flex;
                 align-items: center;
-                padding: 6px 8px;
+                padding: 0 8px;
                 gap: 4px;
                 min-width: 0;
             }
 
             .amount-number input {
                 flex: 1;
-                min-width: 0;
-                font-size: 12px;
+                font-size: 11px;
                 text-align: right;
                 border: none;
                 outline: none;
                 background: transparent;
+            }
+
+            /* ==================== 条款区域优化 ==================== */
+            .terms, .agreement {
+                font-size: 11px;
+                padding: 8px 10px;
+                margin-top: 8px;
+                line-height: 1.6;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            .terms input {
+                font-size: 12px;
+                padding: 2px 4px;
+                border: none;
+                outline: none;
+                background: transparent;
+                border-bottom: 1px solid #333;
+                width: 80px;
+            }
+
+            .terms input:focus {
+                background: #f0f8ff;
             }
 
             /* ==================== 商品表格优化 ==================== */
@@ -1767,8 +1731,6 @@
                 width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
-                margin: 0 -5px;
-                padding: 0 5px;
             }
 
             .product-table-wrapper::-webkit-scrollbar {
@@ -1787,42 +1749,40 @@
 
             .product-table {
                 width: 100%;
-                min-width: 680px;
+                min-width: 600px;
                 font-size: 11px;
+                border-collapse: collapse;
             }
 
             .product-table th {
-                padding: 8px 4px;
+                padding: 6px 4px;
                 font-size: 10px;
                 white-space: nowrap;
                 background: #d6d8db;
+                border: 1px solid #333;
             }
 
             .product-table td {
-                height: auto;
                 padding: 6px 4px;
                 font-size: 11px;
                 white-space: nowrap;
+                border: 1px solid #333;
             }
 
             .product-table input {
                 width: 100%;
-                min-width: 0;
-                font-size: 12px;
-                padding: 4px 2px;
+                font-size: 11px;
+                padding: 2px 4px;
                 border: none;
                 outline: none;
                 background: transparent;
                 white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
 
             .product-table input:focus {
                 background: #f0f8ff;
             }
 
-            /* 商品表格表头固定 */
             .product-table thead th {
                 background: #d6d8db;
                 position: sticky;
